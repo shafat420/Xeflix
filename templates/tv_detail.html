@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tv_show.name }}{% endblock %}
+
+{% block content %}
+    <h1>{{ tv_show.name }}</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <img src="https://image.tmdb.org/t/p/w500{{ tv_show.poster_path }}" class="img-fluid" alt="{{ tv_show.name }}">
+        </div>
+        <div class="col-md-8">
+            <p><strong>First Air Date:</strong> {{ tv_show.first_air_date }}</p>
+            <p><strong>Overview:</strong> {{ tv_show.overview }}</p>
+            <p><strong>Rating:</strong> {{ tv_show.vote_average }}/10</p>
+            <h3>Seasons</h3>
+            <ul>
+                {% for season in tv_show.seasons %}
+                    <li>
+                        <h4>Season {{ season.season_number }}</h4>
+                        <p>{{ season.episode_count }} episodes</p>
+                        <ul>
+                            {% for episode in range(1, season.episode_count + 1) %}
+                                <li>
+                                    <a href="{{ url_for('episode_detail', tv_id=tv_show.id, season_number=season.season_number, episode_number=episode) }}">
+                                        Episode {{ episode }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

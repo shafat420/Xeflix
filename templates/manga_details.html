@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ manga.title.english or manga.title.romaji }} - Xeflix{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <img src="{{ manga.coverImage.large }}" alt="{{ manga.title.english or manga.title.romaji }}" class="img-fluid rounded shadow-sm" loading="lazy">
+        </div>
+        <div class="col-md-8">
+            <h1 class="mb-3">{{ manga.title.english or manga.title.romaji }}</h1>
+            <p class="text-muted">{{ manga.title.native }}</p>
+            <div class="mb-3">
+                <span class="badge bg-primary">{{ manga.format }}</span>
+                <span class="badge bg-secondary">{{ manga.status }}</span>
+                {% if manga.chapters %}
+                    <span class="badge bg-info">{{ manga.chapters }} chapters</span>
+                {% endif %}
+            </div>
+            <p id="description" class="collapse">{{ manga.description | safe }}</p>
+            <a class="btn btn-link p-0" data-bs-toggle="collapse" href="#description" role="button" aria-expanded="false" aria-controls="description">
+                Read More
+            </a>
+            <div class="mb-3">
+                <strong>Genres:</strong> 
+                {% for genre in manga.genres %}
+                    <span class="badge bg-light text-dark me-1">{{ genre }}</span>
+                {% endfor %}
+            </div>
+            {% if manga.startDate.year %}
+                <p><strong>Start Date:</strong> {{ manga.startDate.year }}-{{ manga.startDate.month }}-{{ manga.startDate.day }}</p>
+            {% endif %}
+            {% if manga.endDate.year %}
+                <p><strong>End Date:</strong> {{ manga.endDate.year }}-{{ manga.endDate.month }}-{{ manga.endDate.day }}</p>
+            {% endif %}
+            <a href="{{ url_for('read_manga', id=manga.id, chapter=1) }}" class="btn btn-primary mt-3">Read Now</a>
+        </div>
+    </div>
+
+    {% if manga.characters.edges %}
+        <h2 class="mt-5 mb-4">Characters</h2>
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3">
+            {% for edge in manga.characters.edges[:12] %}
+                <div class="col">
+                    <div class="card h-100 glow-manga">
+                        <img src="{{ edge.node.image.medium }}" class="card-img-top" alt="{{ edge.node.name.full }}" loading="lazy">
+                        <div class="card-body p-2">
+                            <h6 class="card-title text-truncate mb-0">{{ edge.node.name.full }}</h6>
+                            <p class="card-text"><small>{{ edge.role }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 767px) {
+        h1 {
+            font-size: 1.5rem;
+        }
+        .card-img-top {
+            height: 150px;
+            object-fit: cover;
+        }
+        .card-title {
+            font-size: 0.9rem;
+        }
+        .card-text {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+<button id="back-to-top" class="btn btn-primary btn-sm position-fixed bottom-0 end-0 m-3 d-none d-md-none">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var backToTop = document.getElementById('back-to-top');
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 100) {
+                backToTop.classList.remove('d-none');
+            } else {
+                backToTop.classList.add('d-none');
+            }
+        });
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+    });
+</script>

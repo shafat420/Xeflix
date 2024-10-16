@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{{ episode.name }}{% endblock %}
+
+{% block content %}
+    <h1>{{ episode.name }}</h1>
+    <p><strong>Season:</strong> {{ episode.season_number }}</p>
+    <p><strong>Episode:</strong> {{ episode.episode_number }}</p>
+    <p><strong>Air Date:</strong> {{ episode.air_date }}</p>
+    <p><strong>Overview:</strong> {{ episode.overview }}</p>
+    <h3>Watch Episode</h3>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" src="{{ stream_url }}" allowfullscreen></iframe>
+    </div>
+{% endblock %}

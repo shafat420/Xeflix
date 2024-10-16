@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Xeflix{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Welcome to Xeflix</h1>
+    
+    <h2 class="mb-3">Trending Now</h2>
+    <div class="row row-cols-1 row-cols-md-5 g-4 mb-5">
+        {% for item in trending %}
+            <div class="col">
+                <div class="card h-100">
+                    <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" class="card-img-top" alt="{{ item.title or item.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.title or item.name }}</h5>
+                        <a href="{{ url_for('watch', media_type=item.media_type, id=item.id) }}" class="btn btn-danger">Watch</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2 class="mb-3">Popular Movies</h2>
+    <div class="row row-cols-1 row-cols-md-5 g-4 mb-5">
+        {% for movie in popular_movies %}
+            <div class="col">
+                <div class="card h-100">
+                    <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" class="card-img-top" alt="{{ movie.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ movie.title }}</h5>
+                        <a href="{{ url_for('watch', media_type='movie', id=movie.id) }}" class="btn btn-danger">Watch</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2 class="mb-3">Popular TV Shows</h2>
+    <div class="row row-cols-1 row-cols-md-5 g-4">
+        {% for show in popular_tv %}
+            <div class="col">
+                <div class="card h-100">
+                    <img src="https://image.tmdb.org/t/p/w500{{ show.poster_path }}" class="card-img-top" alt="{{ show.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ show.name }}</h5>
+                        <a href="{{ url_for('watch', media_type='tv', id=show.id) }}" class="btn btn-danger">Watch</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2 class="mt-4">Trending Manga</h2>
+    <div class="row row-cols-2 row-cols-md-5 g-4">
+        {% for manga in trending_manga %}
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{{ manga.coverImage.large }}" class="card-img-top" alt="{{ manga.title.english or manga.title.romaji }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ manga.title.english or manga.title.romaji }}</h5>
+                        <a href="{{ url_for('manga_details', id=manga.id) }}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

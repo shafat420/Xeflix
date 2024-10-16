@@ -1,0 +1,43 @@
+/* Glowing effect for cards */
+.card {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+}
+
+/* Glowing effect for images */
+.glow-image {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.glow-image:hover {
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.7);
+}
+
+/* Glowing effect for buttons */
+.btn {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.btn:hover {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+/* Custom glow colors for different content types */
+.glow-anime:hover {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);  /* Red glow for anime */
+}
+
+.glow-manga:hover {
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);  /* Green glow for manga */
+}
+
+.glow-movie:hover {
+    box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);  /* Orange glow for movies */
+}
+
+.glow-tv:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 255, 0.5);  /* Blue glow for TV shows */
+}

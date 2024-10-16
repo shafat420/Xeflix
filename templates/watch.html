@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.title or item.name }} - Xeflix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+<style>
+    .movie-details {
+        background-color: #141414;
+        color: #fff;
+        min-height: 100vh;
+    }
+    .backdrop {
+        position: relative;
+        height: 70vh;
+        background-size: cover;
+        background-position: center;
+    }
+    .backdrop-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(20,20,20,0.5) 0%, rgba(20,20,20,1) 100%);
+    }
+    .content {
+        position: relative;
+        z-index: 1;
+        padding-top: 50px;
+    }
+    .poster {
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .rating-stars {
+        color: #ffc107;
+    }
+    .review-card {
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    .cast-image {
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="movie-details">
+    <div class="backdrop" style="background-image: url('https://image.tmdb.org/t/p/w1280{{ item.backdrop_path }}');">
+        <div class="backdrop-overlay"></div>
+    </div>
+    <div class="container content">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" 
+                     class="img-fluid poster"
+                     alt="{{ item.title or item.name }}"
+                     loading="lazy">
+            </div>
+            <div class="col-md-8">
+                <h1 class="mb-3">{{ item.title or item.name }}</h1>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rating-stars me-2">
+                        {% set rating = (item.vote_average / 2)|round(0, 'floor') %}
+                        {% for i in range(5) %}
+                            {% if i < rating %}
+                                <i class="fas fa-star"></i>
+                            {% elif i == rating and (item.vote_average / 2) % 1 >= 0.5 %}
+                                <i class="fas fa-star-half-alt"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span>{{ item.vote_average|round(1, 'floor') }} ({{ item.vote_count }} votes)</span>
+                </div>
+                <p class="lead">{{ item.overview }}</p>
+                <div class="mb-3">
+                    {% for genre in item.genres %}
+                        <span class="badge bg-secondary me-1">{{ genre.name }}</span>
+                    {% endfor %}
+                </div>
+                <div class="d-flex flex-wrap mb-3">
+                    <a href="{{ url_for('stream', media_type=media_type, id=item.id) }}" class="btn btn-danger btn-lg me-2 mb-2">Watch Now</a>
+                    {% if item.videos and item.videos.results %}
+                        <button type="button" class="btn btn-outline-light btn-lg me-2 mb-2" data-bs-toggle="modal" data-bs-target="#trailerModal">
+                            <i class="fas fa-play me-2"></i>Watch Trailer
+                        </button>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-light btn-lg mb-2" onclick="toggleFavorite('{{ item.id }}')">
+                        <i id="favoriteIcon-{{ item.id }}" class="far fa-heart me-2"></i>Add to Favorites
+                    </button>
+                </div>
+                <div class="row g-3">
+                    {% if media_type == 'movie' %}
+                        <div class="col-sm-6"><i class="fas fa-calendar-alt me-2"></i><strong>Release Date:</strong> {{ item.release_date }}</div>
+                        <div class="col-sm-6"><i class="fas fa-clock me-2"></i><strong>Runtime:</strong> {{ item.runtime }} min</div>
+                    {% else %}
+                        <div class="col-sm-6"><i class="fas fa-calendar-alt me-2"></i><strong>First Air Date:</strong> {{ item.first_air_date }}</div>
+                        <div class="col-sm-6"><i class="fas fa-tv me-2"></i><strong>Episodes:</strong> {{ item.number_of_episodes }}</div>
+                    {% endif %}
+                    <div class="col-sm-6"><i class="fas fa-language me-2"></i><strong>Original Language:</strong> {{ item.original_language|upper }}</div>
+                    {% if item.production_companies %}
+                        <div class="col-12"><i class="fas fa-film me-2"></i><strong>Production:</strong> {{ item.production_companies|map(attribute='name')|join(', ') }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-8">
+                {% if item.credits and item.credits.cast %}
+                    <h2 class="mb-3">Cast</h2>
+                    <div class="row row-cols-2 row-cols-md-4 g-4 mb-5">
+                        {% for cast_member in item.credits.cast[:8] %}
+                            <div class="col">
+                                <div class="text-center">
+                                    {% if cast_member.profile_path %}
+                                        <img src="https://image.tmdb.org/t/p/w185{{ cast_member.profile_path }}" 
+                                             class="img-fluid cast-image mb-2" 
+                                             alt="{{ cast_member.name }}"
+                                             loading="lazy">
+                                    {% else %}
+                                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center cast-image mb-2">
+                                            <span>No Image</span>
+                                        </div>
+                                    {% endif %}
+                                    <h6>{{ cast_member.name }}</h6>
+                                    <p class="text-muted"><small>{{ cast_member.character }}</small></p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if item.reviews and item.reviews.results %}
+                    <h2 class="mb-3">User Reviews</h2>
+                    {% for review in item.reviews.results[:3] %}
+                        <div class="review-card">
+                            <h5>{{ review.author }}</h5>
+                            <p>{{ review.content[:200] }}{% if review.content|length > 200 %}...{% endif %}</p>
+                            <small class="text-muted">{{ review.created_at[:10] }}</small>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                {% if media_type == 'tv' and item.seasons %}
+                    <h2 class="mb-3">Seasons</h2>
+                    <div class="list-group mb-4">
+                        {% for season in item.seasons %}
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ season.name }}</h5>
+                                    <small>{{ season.episode_count }} episodes</small>
+                                </div>
+                                <p class="mb-1">Air Date: {{ season.air_date }}</p>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if item.similar and item.similar.results %}
+                    <h2 class="mb-3">Similar {{ 'Movies' if media_type == 'movie' else 'TV Shows' }}</h2>
+                    <div class="list-group">
+                        {% for similar_item in item.similar.results[:5] %}
+                            <a href="{{ url_for('watch', media_type=media_type, id=similar_item.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ similar_item.title or similar_item.name }}</h5>
+                                    <small>{{ similar_item.release_date[:4] if similar_item.release_date else similar_item.first_air_date[:4] }}</small>
+                                </div>
+                                <p class="mb-1">{{ similar_item.overview[:100] }}...</p>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if item.videos and item.videos.results %}
+    <div class="modal fade" id="trailerModal" tabindex="-1" aria-labelledby="trailerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="trailerModalLabel">Trailer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/{{ item.videos.results[0].key }}" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleFavorite(itemId) {
+        const icon = document.getElementById('favoriteIcon');
+        if (icon.classList.contains('far')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            // Add to favorites (you'll need to implement this functionality)
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            // Remove from favorites (you'll need to implement this functionality)
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Anime - Xeflix{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Popular Anime</h1>
+    
+    <div class="row row-cols-2 row-cols-md-5 g-4">
+        {% for anime in anime_list %}
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{{ anime.coverImage.large }}" class="card-img-top" alt="{{ anime.title.english or anime.title.romaji }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ anime.title.english or anime.title.romaji }}</h5>
+                        <p class="card-text">Episodes: {{ anime.episodes }}</p>
+                        <p class="card-text">Score: {{ anime.averageScore / 10 }}/10</p>
+                        <a href="{{ url_for('anime_details', id=anime.id) }}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_info.currentPage > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('anime', page=page_info.currentPage-1) }}">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item active">
+                <span class="page-link">{{ page_info.currentPage }}</span>
+            </li>
+            {% if page_info.hasNextPage %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('anime', page=page_info.currentPage+1) }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

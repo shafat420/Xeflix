@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Xeflix{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Search Results for "{{ query }}"</h1>
+    
+    {% if results %}
+        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
+            {% for item in results %}
+                <div class="col">
+                    <div class="card h-100 glow-{{ item.type.lower() }}">
+                        {% if item.image %}
+                            <img src="{{ item.image.medium if item.type in ['ANIME', 'MANGA'] else item.image }}" 
+                                 class="card-img-top glow-image" 
+                                 alt="{{ item.title }}" 
+                                 loading="lazy"
+                                 srcset="{{ item.image.medium if item.type in ['ANIME', 'MANGA'] else item.image }} 1x, 
+                                         {{ item.image.large if item.type in ['ANIME', 'MANGA'] else item.image }} 2x">
+                        {% else %}
+                            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <span>No Image</span>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title text-truncate">{{ item.title }}</h5>
+                            <p class="card-text">Type: {{ item.type }}</p>
+                            {% if item.type in ['ANIME', 'MANGA'] %}
+                                <a href="{{ url_for(item.type.lower() + '_details', id=item.id) }}" class="btn btn-primary btn-sm w-100">View Details</a>
+                            {% else %}
+                                <a href="{{ url_for('watch', media_type=item.type.lower(), id=item.id) }}" class="btn btn-primary btn-sm w-100">View Details</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 767px) {
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-title {
+            font-size: 0.9rem;
+        }
+        .btn-sm {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+    }
+</style>
+{% endblock %}

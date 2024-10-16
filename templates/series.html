@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}TV Series - Xeflix{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Popular TV Series</h1>
+    
+    <div class="row row-cols-1 row-cols-md-5 g-4 mb-4">
+        {% for show in series %}
+            <div class="col">
+                <div class="card h-100">
+                    <img src="https://image.tmdb.org/t/p/w500{{ show.poster_path }}" class="card-img-top" alt="{{ show.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ show.name }}</h5>
+                        <p class="card-text">{{ show.first_air_date }}</p>
+                        <a href="{{ url_for('watch', media_type='tv', id=show.id) }}" class="btn btn-danger">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if current_page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('series', page=current_page-1) }}">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item active">
+                <span class="page-link">{{ current_page }}</span>
+            </li>
+            {% if current_page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('series', page=current_page+1) }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endblock %}
