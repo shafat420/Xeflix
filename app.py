@@ -546,8 +546,8 @@ def internal_server_error(e):
     return render_template('error.html', message="Internal server error"), 500
 
 if __name__ == '__main__':
-    # Use the PORT environment variable provided by the deployment platform, or default to 5000
-    port = int(os.environ.get("PORT", 5000))
+    # Get port from environment variable or default to 5000
+    port = int(os.environ.get('PORT', 5000))
     
-    # Run the Flask app
+    # Run the app, binding to 0.0.0.0 (all network interfaces)
     app.run(host='0.0.0.0', port=port)
