@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 import requests
 import logging
 import os
-from gunicorn.app.base import BaseApplication
 
 app = Flask(__name__)
 
@@ -547,31 +546,8 @@ def internal_server_error(e):
     return render_template('error.html', message="Internal server error"), 500
 
 if __name__ == '__main__':
-    # Use the PORT environment variable provided by Render, or default to 5000
+    # Use the PORT environment variable provided by the deployment platform, or default to 5000
     port = int(os.environ.get("PORT", 5000))
     
-    # Create a Gunicorn application
-    class StandaloneApplication(BaseApplication):
-        def __init__(self, app, options=None):
-            self.options = options or {}
-            self.application = app
-            super().__init__()
-
-        def load_config(self):
-            config = {key: value for key, value in self.options.items()
-                      if key in self.cfg.settings and value is not None}
-            for key, value in config.items():
-                self.cfg.set(key.lower(), value)
-
-        def load(self):
-            return self.application
-
-    # Configure Gunicorn options
-    options = {
-        'bind': f'0.0.0.0:{port}',
-        'workers': 4,  # Adjust the number of workers as needed
-        'worker_class': 'gevent',
-    }
-
-    # Run the application using Gunicorn
-    StandaloneApplication(app, options).run()
+    # Run the Flask app
+    app.run(host='0.0.0.0', port=port)
